@@ -50,9 +50,13 @@ static uint8_t spi_xfer(uint8_t n) {
 #else
 
 #include <SPI.h>
-#define CHIP_SELECT   *cs_port &= ~cs_mask;
-#define CHIP_DESELECT *cs_port |=  cs_mask;
+#define CHIP_SELECT   *cs_port &= ~cs_mask;\
+                      SPI.beginTransaction(spi_settings);
+#define CHIP_DESELECT *cs_port |=  cs_mask;\
+                      SPI.endTransaction();
 #define spi_xfer(n)   SPI.transfer(n)
+
+SPISettings spi_settings(96000000, MSBFIRST, SPI_MODE0);
 
 #endif
 
@@ -81,9 +85,9 @@ uint32_t Adafruit_TinyFlash::begin(void) {
               |   _BV(PORTB2)  // SCK
               |   cs_mask;     // CS
 #else
-	SPI.begin();
+	//SPI.begin();
 	// Resistor-based 5V->3.3V logic conversion is a little sloppy, so:
-	SPI.setClockDivider(SPI_CLOCK_DIV8); // 500 KHz
+	//SPI.setClockDivider(SPI_CLOCK_DIV8); // 500 KHz
 #endif
 
 	cmd(CMD_ID);
